@@ -18,6 +18,7 @@
       "name": "web",
       "version": "1.0.0",
       "dependencies": {
+        "@repo/auth": "*",
         "@repo/ui": "*",
         "better-auth": "^1.4.17",
         "next": "14.2.35",
