@@ -72,3 +72,32 @@ model Verification {
   @@index([identifier])
   @@map("verification")
 }
+
+model Website {
+  id        String         @id @default(uuid())
+  url       String
+  timeAdded DateTime
+  ticks     WebsiteTicks[]
+}
+
+model Region {
+  id     String         @id @default(uuid())
+  name   String
+  tickes WebsiteTicks[]
+}
+
+model WebsiteTicks {
+  id               String        @id @default(uuid())
+  response_time_ms Int
+  status           WebsiteStatus
+  regain_id        String
+  website_id       String
+  region           Region        @relation(fields: [regain_id], references: [id])
+  website          Website       @relation(fields: [website_id], references: [id])
+}
+
+enum WebsiteStatus {
+  Up
+  down
+  Unknown
+}
