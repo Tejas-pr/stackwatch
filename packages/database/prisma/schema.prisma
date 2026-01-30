@@ -20,7 +20,6 @@ model User {
   updatedAt     DateTime  @updatedAt
   sessions      Session[]
   accounts      Account[]
-
   websites      Website[]
 
   @@unique([email])
@@ -78,10 +77,10 @@ model Verification {
 model Website {
   id        String         @id @default(uuid())
   url       String
-  timeAdded DateTime        @default(now())
+  timeAdded DateTime       @default(now())
   ticks     WebsiteTicks[]
   user_id   String
-  user      User            @relation(fields: [user_id], references: [id])
+  user      User           @relation(fields: [user_id], references: [id])
 }
 
 model Region {
@@ -99,7 +98,7 @@ model WebsiteTicks {
   website_id       String
   region           Region        @relation(fields: [regain_id], references: [id])
   website          Website       @relation(fields: [website_id], references: [id])
-  createdAt        DateTime       @default(now())
+  createdAt        DateTime      @default(now())
 }
 
 enum WebsiteStatus {

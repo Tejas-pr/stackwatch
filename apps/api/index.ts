@@ -8,6 +8,7 @@ app.use(express.json());
 
 const envOrigins = process.env.MAINORIGINS;
 const envOrigins2 = process.env.MAINORIGINS2;
+const BACKEND_PORT = process.env.BACKEND_PORT || 3000;
 
 const allowedOrigins = [
     "http://localhost:3000",
@@ -43,4 +44,6 @@ app.use(cors());
 
 app.use("/", authMiddleware, websiteRoute);
 
-app.listen(process.env.PORT || 3000);
+app.listen(BACKEND_PORT, () => {
+    console.log(`App running on port: ${BACKEND_PORT}`)
+});

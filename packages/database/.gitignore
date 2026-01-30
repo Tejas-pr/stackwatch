@@ -1,2 +1,5 @@
 generated
 dist
+./dist
+./stackwatch/packages/database/dist
+./database/dist
