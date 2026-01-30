@@ -28,7 +28,9 @@
   "name": "with-prisma",
   "dependencies": {
     "@prisma/adapter-pg": "^7.2.0",
-    "@prisma/client": "latest"
+    "@prisma/client": "latest",
+    "@types/cors": "^2.8.19",
+    "cors": "^2.8.6"
   },
   "packageManager": "bun@1.2.22",
   "workspaces": [

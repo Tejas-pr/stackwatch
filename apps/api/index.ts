@@ -1,45 +1,46 @@
 import express from "express";
-import { prisma } from "@repo/database";
+import websiteRoute from "./src/routes/website.route";
+import cors from "cors";
+import authMiddleware from "./src/middleware/user.middleware";
 
 const app = express();
 app.use(express.json());
 
-app.get("/", async (req, res) => {
-    const respo = await prisma.user.findMany();
-    return res.status(200).send(respo)
-});
+const envOrigins = process.env.MAINORIGINS;
+const envOrigins2 = process.env.MAINORIGINS2;
 
-app.get("/status/:wensiteId", (req, res) => {
-    return res.status(200).send("hi herelk")
-});
+const allowedOrigins = [
+    "http://localhost:3000",
+    "http://localhost:3001",
+    "https://4r5w0cht-3000.inc1.devtunnels.ms",
+    "https://4r5w0cht-3001.inc1.devtunnels.ms",
+    envOrigins,
+    envOrigins2
+];
 
-app.post("/website", async (req, res) => {
-    try {
-        const url = req.body.url;
-        const user_id = req.user_id;
-        if (!url) {
-            return res.status(400).json({
-                success: "false",
-                message: "Please provide url!!"
-            });
-        }
+// const limiter = rateLimit({
+//   windowMs: 15 * 60 * 1000,
+//   max: 100,
+//   message: {
+//     error: true,
+//     message: "Too many requests, please try again later.",
+//   },
+//   standardHeaders: true,
+//   legacyHeaders: false,
+// });
 
-        const response = await prisma.website.create({
-            data: {
-                url,
-                user_id
-            }
-        });
+// app.use(limiter);
 
-        return res.status(200).json({
-            success: "true",
-            message: "Successfully added the url!!",
-            id: response.id
-        })
+// app.use(
+//   cors({
+//     origin: allowedOrigins,
+//     methods: ["GET", "POST", "PUT", "DELETE", "PATCH"],
+//     credentials: true,
+//   }),
+// );
 
-    } catch (e) {
-        console.error(e)
-    }
-});
+app.use(cors());
+
+app.use("/", authMiddleware, websiteRoute);
 
 app.listen(process.env.PORT || 3000);
