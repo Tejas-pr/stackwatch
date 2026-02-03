@@ -22,6 +22,7 @@ declare global {
 }
 
 async function authMiddleware(req: Request, res: Response, next: NextFunction) {
+  console.log(">>>>>>>>>>>>>>>>>>.user_iduser_iduser_id");
   try {
     const session = await auth.api.getSession({
       headers: fromNodeHeaders(req.headers),
@@ -36,6 +37,7 @@ async function authMiddleware(req: Request, res: Response, next: NextFunction) {
     }
 
     req.user = session.user;
+    req.user_id = session.user.id;
     next();
   } catch (e) {
     console.error("Auth error:", e);

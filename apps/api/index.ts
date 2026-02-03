@@ -8,7 +8,7 @@ app.use(express.json());
 
 const envOrigins = process.env.MAINORIGINS;
 const envOrigins2 = process.env.MAINORIGINS2;
-const BACKEND_PORT = process.env.BACKEND_PORT || 3000;
+const BACKEND_PORT = process.env.BACKEND_PORT || 3001;
 
 const allowedOrigins = [
     "http://localhost:3000",
