@@ -24,8 +24,25 @@ export const getWebsiteDetails = async (req: Request, res: Response) => {
             where: {
                 user_id,
                 id: website_id
+            },
+            include: {
+                ticks: {
+                    take: 1,
+                    orderBy: [
+                        {
+                            createdAt: "desc"
+                        }
+                    ]
+                }
             }
         });
+
+        if (!response) {
+            res.status(200).json({
+                success: true,
+                message: "Not found!!"
+            });
+        }
 
         res.status(200).json({
             success: true,
@@ -37,12 +54,9 @@ export const getWebsiteDetails = async (req: Request, res: Response) => {
 }
 
 export const Website = async (req: Request, res: Response) => {
-    console.log(">>>>>>>>>>>>>>>>>>.user_iduser_iduser_id");
     try {
         const user_id = req.user_id;
         const url = req.body.url;
-
-        console.log(">>>>>>>>>>>>>>>>>>.user_iduser_iduser_id", user_id, url)
 
         if (!user_id) {
             return res.status(400).json({
