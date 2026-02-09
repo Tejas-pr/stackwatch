@@ -1,7 +1,7 @@
 // here I need to pick the websites from q and ping and put the status into the DB(bulk).
 import axios from "axios";
 import { prisma } from "@repo/database";
-import { XAckBulk, XReadGroup } from "@repo/redis-queue/redis-client";
+import { ensureConsumerGroup, XAckBulk, XReadGroup } from "@repo/redis-queue/redis-client";
 
 const REGION_ID = process.env.REGION_ID!;
 const WORKER_ID = process.env.WORKER_ID!;
@@ -15,6 +15,8 @@ if (!WORKER_ID) {
 }
 
 async function main() {
+    await ensureConsumerGroup(REGION_ID);
+
     while (1) {
         const response = await XReadGroup(REGION_ID, WORKER_ID);
         if (!response) {

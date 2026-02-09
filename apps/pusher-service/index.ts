@@ -2,6 +2,8 @@
 import { prisma } from "@repo/database";
 import { XAddBulk } from "@repo/redis-queue/redis-client";
 
+const TIME_INTERVAL = process.env.TIME_INTERVAL || 3;
+
 async function fetch() {
     const websites = await prisma.website.findMany({
         select: {
@@ -12,10 +14,12 @@ async function fetch() {
 
     // add to queue
     XAddBulk(websites);
+    console.log("pushed to queue");
 }
 
-setTimeout(() => {
-    fetch();
-}, 3000);
-
 fetch();
+
+setInterval(() => {
+    fetch();
+    console.log("---------- time ----------");
+}, 1000 * 60 * Number(TIME_INTERVAL));

@@ -89,3 +89,20 @@ export const XAckBulk = async (consumer_group: string, event_ids: string[]) => {
         console.error(e);
     }
 }
+
+export const ensureConsumerGroup = async (group: string) => {
+    try {
+        await client.xGroupCreate(
+            STREAM_NAME,
+            group,
+            "0",
+            { MKSTREAM: true }
+        );
+        console.log(`Consumer group '${group}' created`);
+    } catch (e: any) {
+        // BUSYGROUP = already exists → ignore
+        if (!e?.message?.includes("BUSYGROUP")) {
+            throw e;
+        }
+    }
+};

@@ -2,6 +2,10 @@
   "name": "pusher-service",
   "module": "index.ts",
   "type": "module",
+  "scripts": {
+    "dev": "bun run index.ts",
+    "start": "bun run index.ts"
+  },
   "private": true,
   "dependencies": {
     "@repo/database": "*",
