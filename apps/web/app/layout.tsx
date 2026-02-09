@@ -1,4 +1,7 @@
 import "@repo/ui/globals.css";
+import ThemeProvider from "../providers/ThemeProvider";
+import { Toaster } from "@repo/ui/components/sonner"
+
 export default function RootLayout({
   children,
 }: {
@@ -6,7 +9,17 @@ export default function RootLayout({
 }) {
   return (
     <html lang="en">
-      <body>{children}</body>
+      <body>
+        <ThemeProvider
+          attribute="class"
+          defaultTheme="dark"
+          enableSystem
+          disableTransitionOnChange
+        >
+          {children}
+          <Toaster />
+        </ThemeProvider>
+      </body>
     </html>
   );
 }
