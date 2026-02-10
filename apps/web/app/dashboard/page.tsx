@@ -4,7 +4,7 @@ import { useEffect, useState } from "react";
 import DashboardHeader from "../../components/dashboard/header";
 import WebsiteList from "../../components/dashboard/website-list";
 import AddWebsiteModal from "../../components/dashboard/add-website-model";
-import { backendIsWorking, getDashboardDetails } from "../../server";
+import { getDashboardDetails } from "../../server";
 
 export interface Website {
   id: string;
@@ -63,7 +63,9 @@ export default function DashboardPage() {
     setWebsites(websites.filter((w) => w.id !== id));
   };
 
-  const handleRefresh = () => {};
+  const handleRefresh = () => {
+    fetch();
+  };
 
   return (
     <main className="min-h-screen bg-background text-foreground">

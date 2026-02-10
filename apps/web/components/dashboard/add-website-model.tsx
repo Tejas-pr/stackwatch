@@ -13,6 +13,7 @@ import { Input } from "@repo/ui/components/input";
 import { Label } from "@repo/ui/components/label";
 import { AlertCircle, Globe } from "lucide-react";
 import { Website } from "../../app/dashboard/page";
+import { addNewWebsite } from "../../server";
 
 interface AddWebsiteModalProps {
   isOpen: boolean;
@@ -29,7 +30,6 @@ export default function AddWebsiteModal({
 }: AddWebsiteModalProps) {
   const [name, setName] = useState("");
   const [url, setUrl] = useState("");
-  const [uptime, setUptime] = useState("99.9");
   const [errors, setErrors] = useState<Record<string, string>>({});
 
   const validateForm = () => {
@@ -45,15 +45,6 @@ export default function AddWebsiteModal({
       newErrors.url = "Please enter a valid URL";
     }
 
-    if (
-      !uptime ||
-      isNaN(Number(uptime)) ||
-      Number(uptime) < 0 ||
-      Number(uptime) > 100
-    ) {
-      newErrors.uptime = "Uptime must be between 0 and 100";
-    }
-
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0;
   };
@@ -67,17 +58,22 @@ export default function AddWebsiteModal({
     }
   };
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
     if (!validateForm()) {
       return;
     }
 
-    setName("");
-    setUrl("");
-    setUptime("99.9");
-    setErrors({});
+    const res = await addNewWebsite(url);
+
+    if (res.success) {
+      onAdd(res.response)
+      setName("");
+      setUrl("");
+      setErrors({});
+      onClose()
+    }
   };
 
   return (

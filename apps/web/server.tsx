@@ -22,3 +22,16 @@ export const getDashboardDetails = async() => {
         console.error(e)
     }
 }
+
+export const addNewWebsite = async(url: string) => {
+    try {
+        const response = await axios.post(`${BACKEND_URL}/website`,{
+            url
+        },{
+            withCredentials: true
+        })
+        return response.data;
+    } catch (e) {
+        console.error(e)
+    }
+}

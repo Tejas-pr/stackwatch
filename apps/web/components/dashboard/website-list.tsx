@@ -20,7 +20,7 @@ interface WebsiteListProps {
   onDelete: (id: string) => void;
 }
 
-export default function x({ websites=[], onDelete }: WebsiteListProps) {
+export default function x({ websites, onDelete }: WebsiteListProps) {
   const formatTime = (date: Date) => {
     const now = new Date();
     const diff = now.getTime() - new Date(date).getTime();
@@ -66,94 +66,104 @@ export default function x({ websites=[], onDelete }: WebsiteListProps) {
               </TableRow>
             </TableHeader>
             <TableBody>
-              {websites.map((website) => (
-                <TableRow
-                  key={website.id}
-                  className="border-border transition-colors hover:bg-secondary/30"
-                >
-                  <TableCell className="py-4">
-                    <Link
-                      href={`/website/${website.id}`}
-                      className="group flex items-center gap-3"
-                    >
-                      <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-secondary/50">
-                        <Circle
-                          className={`h-5 w-5 transition-all ${
-                            website.ticks[0].status === "Up"
-                              ? "fill-accent text-accent"
-                              : "fill-destructive text-destructive"
-                          }`}
-                        />
+              {websites.map((website) => {
+                const latestTick = website.ticks?.[0];
+
+                return (
+                  <TableRow
+                    key={website.id}
+                    className="border-border transition-colors hover:bg-secondary/30"
+                  >
+                    <TableCell className="py-4">
+                      <Link
+                        href={`/website/${website.id}`}
+                        className="group flex items-center gap-3"
+                      >
+                        <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-secondary/50">
+                          <Circle
+                            className={`h-5 w-5 transition-all ${
+                              latestTick?.status === "Up"
+                                ? "fill-accent text-accent"
+                                : "fill-destructive text-destructive"
+                            }`}
+                          />
+                        </div>
+                        <div className="min-w-0">
+                          <p className="font-semibold group-hover:text-primary transition-colors">
+                            {website.name}
+                          </p>
+                          <p className="text-sm text-muted-foreground truncate">
+                            {website.url}
+                          </p>
+                        </div>
+                      </Link>
+                    </TableCell>
+
+                    <TableCell className="text-center py-4">
+                      <Badge
+                        variant={
+                          latestTick?.status === "Up"
+                            ? "default"
+                            : "destructive"
+                        }
+                        className={
+                          latestTick?.status === "Up"
+                            ? "bg-accent/20 text-accent border-accent/30"
+                            : "bg-destructive/20 text-destructive border-destructive/30"
+                        }
+                      >
+                        {latestTick?.status === "Up"
+                          ? "Online"
+                          : "Offline"}
+                      </Badge>
+                    </TableCell>
+
+                    <TableCell className="text-right py-4">
+                      <div className="font-semibold">
+                        {website.ticks[0].response_time_ms}ms
                       </div>
-                      <div className="min-w-0">
-                        <p className="font-semibold group-hover:text-primary transition-colors">
-                          {website.name}
-                        </p>
-                        <p className="text-sm text-muted-foreground truncate">
-                          {website.url}
-                        </p>
+                      <div className="text-xs text-muted-foreground">
+                        {website.ticks[0].response_time_ms < 100
+                          ? "Fast"
+                          : "Normal"}
                       </div>
-                    </Link>
-                  </TableCell>
+                    </TableCell>
 
-                  <TableCell className="text-center py-4">
-                    <Badge
-                      variant={
-                        website.ticks[0].status === "Up" ? "default" : "destructive"
-                      }
-                      className={
-                        website.ticks[0].status === "Up"
-                          ? "bg-accent/20 text-accent border-accent/30"
-                          : "bg-destructive/20 text-destructive border-destructive/30"
-                      }
-                    >
-                      {website.ticks[0].status === "Up" ? "Online" : "Offline"}
-                    </Badge>
-                  </TableCell>
+                    <TableCell className="text-right py-4">
+                      <div className="flex items-center justify-end gap-2 text-sm">
+                        <Clock className="h-4 w-4 text-muted-foreground" />
+                        <span className="text-muted-foreground">
+                          {formatTime(website.ticks[0].createdAt)}
+                        </span>
+                      </div>
+                    </TableCell>
 
-                  <TableCell className="text-right py-4">
-                    <div className="font-semibold">
-                      {website.ticks[0].response_time_ms}ms
-                    </div>
-                    <div className="text-xs text-muted-foreground">
-                      {website.ticks[0].response_time_ms < 100 ? "Fast" : "Normal"}
-                    </div>
-                  </TableCell>
-
-                  <TableCell className="text-right py-4">
-                    <div className="flex items-center justify-end gap-2 text-sm">
-                      <Clock className="h-4 w-4 text-muted-foreground" />
-                      <span className="text-muted-foreground">
-                        {formatTime(website.ticks[0].createdAt)}
-                      </span>
-                    </div>
-                  </TableCell>
-
-                  <TableCell className="text-right py-4">
-                    <div className="flex items-center justify-end gap-2">
-                      <Link href={`/website/${website.id}`}>
+                    <TableCell className="text-right py-4">
+                      <div className="flex items-center justify-end gap-2">
+                        <Link href={`/website/${website.id}`}>
+                          <Button
+                            variant="ghost"
+                            size="sm"
+                            className="gap-1 h-8 px-2"
+                          >
+                            <ChevronRight className="h-4 w-4" />
+                            <span className="sr-only">View details</span>
+                          </Button>
+                        </Link>
                         <Button
                           variant="ghost"
                           size="sm"
-                          className="gap-1 h-8 px-2"
+                          onClick={() => onDelete(website.id)}
+                          className="h-8 px-2 text-destructive hover:bg-destructive/10 hover:text-destructive"
                         >
-                          <ChevronRight className="h-4 w-4" />
-                          <span className="sr-only">View details</span>
+                          <Trash2 className="h-4 w-4" />
+                          <span className="sr-only">Delete website</span>
                         </Button>
-                      </Link>
-                      <Button
-                        variant="ghost"
-                        size="sm"
-                        onClick={() => onDelete(website.id)}
-                        className="h-8 px-2 text-destructive hover:bg-destructive/10 hover:text-destructive"
-                      >
-                        <Trash2 className="h-4 w-4" />
-                        <span className="sr-only">Delete website</span>
-                      </Button>
-                    </div>
-                  </TableCell>
-                </TableRow>
-              ))}
+                      </div>
+                    </TableCell>
+                  </TableRow>
+                );
+              })}
             </TableBody>
           </Table>
         </Card>
