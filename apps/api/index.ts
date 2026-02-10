@@ -1,49 +1,64 @@
 import express from "express";
-import websiteRoute from "./src/routes/website.route";
 import cors from "cors";
+import rateLimit from "express-rate-limit";
+
+import websiteRoute from "./src/routes/website.route";
 import authMiddleware from "./src/middleware/user.middleware";
 
 const app = express();
-app.use(express.json());
 
-const envOrigins = process.env.MAINORIGINS;
-const envOrigins2 = process.env.MAINORIGINS2;
-const BACKEND_PORT = process.env.BACKEND_PORT || 3001;
+const BACKEND_PORT = Number(process.env.BACKEND_PORT) || 3001;
 
 const allowedOrigins = [
     "http://localhost:3000",
     "http://localhost:3001",
     "https://4r5w0cht-3000.inc1.devtunnels.ms",
     "https://4r5w0cht-3001.inc1.devtunnels.ms",
-    envOrigins,
-    envOrigins2
-];
+    process.env.MAINORIGINS,
+    process.env.MAINORIGINS2,
+].filter(Boolean);
 
-// const limiter = rateLimit({
-//   windowMs: 15 * 60 * 1000,
-//   max: 100,
-//   message: {
-//     error: true,
-//     message: "Too many requests, please try again later.",
-//   },
-//   standardHeaders: true,
-//   legacyHeaders: false,
-// });
+app.use(
+    cors({
+        origin: (origin, callback) => {
+            if (!origin) return callback(null, true);
 
-// app.use(limiter);
+            if (allowedOrigins.includes(origin)) {
+                return callback(null, true);
+            }
 
-// app.use(
-//   cors({
-//     origin: allowedOrigins,
-//     methods: ["GET", "POST", "PUT", "DELETE", "PATCH"],
-//     credentials: true,
-//   }),
-// );
+            return callback(new Error("Not allowed by CORS"));
+        },
+        methods: ["GET", "POST", "PUT", "DELETE", "PATCH"],
+        credentials: true,
+    })
+);
 
-app.use(cors());
+app.set("trust proxy", 1); // important for rate limiter behind proxies
+app.use(express.json());
 
-app.use("/", authMiddleware, websiteRoute);
+const limiter = rateLimit({
+    windowMs: 15 * 60 * 1000,
+    max: 100,
+    standardHeaders: true,
+    legacyHeaders: false,
+    message: {
+        error: true,
+        message: "Too many requests, please try again later.",
+    },
+});
+
+app.use("/api", limiter);
+
+app.get("/health", (_req, res) => {
+    res.status(200).json({
+        status: "ok",
+        message: "Server is healthy",
+    });
+});
+
+app.use("/api", authMiddleware, websiteRoute);
 
 app.listen(BACKEND_PORT, () => {
-    console.log(`App running on port: ${BACKEND_PORT}`)
+    console.log(`Server running on port ${BACKEND_PORT}`);
 });

@@ -1,6 +1,64 @@
 import { prisma } from "@repo/database";
 import type { Request, Response } from "express";
 
+export const getDashboardDetails = async (req: Request, res: Response) => {
+    try {
+        const user_id = req.user_id
+        if (!user_id) {
+            return res.status(401).json({ success: false, message: "Unauthorized" })
+        }
+
+        const [totalSites, websites, totalTicks, upTicks] = await Promise.all([
+            prisma.website.count({ where: { user_id } }),
+
+            prisma.website.findMany({
+                where: { user_id },
+                select: {
+                    id: true,
+                    url: true,
+                    timeAdded: true,
+                    ticks: {
+                        take: 1,
+                        orderBy: { createdAt: "desc" },
+                        select: {
+                            status: true,
+                            response_time_ms: true,
+                            createdAt: true
+                        }
+                    }
+                }
+            }),
+
+            prisma.websiteTicks.count({
+                where: { website: { user_id } }
+            }),
+
+            prisma.websiteTicks.count({
+                where: { website: { user_id }, status: "Up" }
+            })
+        ])
+
+        const averageUptime =
+            totalTicks === 0 ? 0 : Number(((upTicks / totalTicks) * 100).toFixed(2))
+
+        const issues = websites.filter(
+            w => w.ticks[0]?.status === "down"
+        ).length
+
+        return res.json({
+            success: true,
+            data: {
+                totalSites,
+                averageUptime,
+                issues,
+                websites
+            }
+        })
+    } catch (e: any) {
+        return res.status(500).json({ message: e.message })
+    }
+}
+
 export const getWebsiteDetails = async (req: Request, res: Response) => {
     try {
         const user_id = req.user_id;

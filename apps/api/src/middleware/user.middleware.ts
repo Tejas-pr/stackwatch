@@ -22,7 +22,6 @@ declare global {
 }
 
 async function authMiddleware(req: Request, res: Response, next: NextFunction) {
-  console.log(">>>>>>>>>>>>>>>>>>.user_iduser_iduser_id");
   try {
     const session = await auth.api.getSession({
       headers: fromNodeHeaders(req.headers),
