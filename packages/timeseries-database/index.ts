@@ -8,12 +8,12 @@ const PASSWORD_NAME = process.env.PASSWORD_NAME || "tsdb";
 const MAX = Number(process.env.MAX) || 10;
 
 const tsdb = postgres({
-    host: HOST,
-    port: PORT,
-    database: DATABASE_NAME,
-    username: USERNAME_NAME,
-    password: PASSWORD_NAME,
-    max: MAX
+  host: HOST,
+  port: PORT,
+  database: DATABASE_NAME,
+  username: USERNAME_NAME,
+  password: PASSWORD_NAME,
+  max: MAX
 });
 
 export async function insertWebsiteTick({
@@ -38,7 +38,7 @@ export async function insertWebsiteTick({
 // latest tick for a website
 export async function getLatestTick(websiteId: string) {
   const rows = await tsdb`
-    SELECT time, status, response_time_ms
+    SELECT time, status, response_time_ms, region_id, website_id
     FROM website_ticks
     WHERE website_id = ${websiteId}
     ORDER BY time DESC
@@ -88,7 +88,7 @@ export async function getRecentTicks(
   limit: number
 ) {
   return tsdb`
-    SELECT time, status, response_time_ms
+    SELECT time, status, response_time_ms, region_id, website_id
     FROM website_ticks
     WHERE website_id = ${websiteId}
     ORDER BY time DESC

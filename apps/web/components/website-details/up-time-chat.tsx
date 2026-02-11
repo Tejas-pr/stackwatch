@@ -1,4 +1,4 @@
-'use client'
+"use client";
 
 import {
   LineChart,
@@ -8,49 +8,50 @@ import {
   CartesianGrid,
   Tooltip,
   ResponsiveContainer,
-} from 'recharts'
-import { Card } from '@repo/ui/components/card'
+} from "recharts";
+import { Card } from "@repo/ui/components/card";
 
-type WebsiteStatus = 'Up' | 'down' | 'Unknown'
+type WebsiteStatus = "Up" | "down" | "Unknown";
 
 interface TickUI {
-  timestamp: Date
-  responseTime: number
-  status: WebsiteStatus
-  region: string
+  timestamp: Date;
+  responseTime: number;
+  status: WebsiteStatus;
+  region: string;
 }
 
 interface UptimeChartProps {
-  ticks: TickUI[]
+  ticks: TickUI[];
 }
 
 export default function UptimeChart({ ticks }: UptimeChartProps) {
-  const now = new Date()
+  const now = new Date();
 
   const chartData = Array.from({ length: 24 }, (_, i) => {
-    const hour = new Date(now)
-    hour.setHours(now.getHours() - (23 - i), 0, 0, 0)
+    const hourEnd = new Date(now);
+    hourEnd.setMinutes(0, 0, 0);
+    hourEnd.setHours(now.getHours() - (23 - i));
+
+    const hourStart = new Date(hourEnd);
+    hourStart.setHours(hourEnd.getHours() - 1);
 
     const hourTicks = ticks.filter((t) => {
-      const d = new Date(t.timestamp)
-      return (
-        d.getHours() === hour.getHours() &&
-        d.toDateString() === hour.toDateString()
-      )
-    })
+      const ts = new Date(t.timestamp);
+      return ts >= hourStart && ts < hourEnd;
+    });
 
-    const total = hourTicks.length
-    const up = hourTicks.filter((t) => t.status === 'Up').length
+    const total = hourTicks.length;
+    const up = hourTicks.filter((t) => t.status === "Up").length;
 
     return {
-      time: hour.toLocaleTimeString('en-US', {
-        hour: '2-digit',
-        minute: '2-digit',
+      time: hourEnd.toLocaleTimeString([], {
+        hour: "2-digit",
+        minute: "2-digit",
         hour12: false,
       }),
-      uptime: total === 0 ? 0 : Math.round((up / total) * 100),
-    }
-  })
+      uptime: total === 0 ? 100 : Math.round((up / total) * 100),
+    };
+  });
 
   return (
     <Card className="border-border bg-card p-6">
@@ -74,5 +75,5 @@ export default function UptimeChart({ ticks }: UptimeChartProps) {
         </LineChart>
       </ResponsiveContainer>
     </Card>
-  )
+  );
 }

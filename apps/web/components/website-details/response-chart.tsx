@@ -12,7 +12,7 @@ import {
 import { Card } from '@repo/ui/components/card'
 
 interface Tick {
-  timestamp: Date
+  timestamp: Date | string
   responseTime: number
   status: 'Up' | 'down' | 'Unknown'
   region: string
@@ -23,60 +23,61 @@ interface ResponseTimeChartProps {
 }
 
 export default function ResponseTimeChart({ ticks }: ResponseTimeChartProps) {
-  // Convert ticks to hourly aggregates
-  const chartData = Array.from({ length: 24 }, (_, i) => {
-    const hourStart = new Date()
-    hourStart.setHours(hourStart.getHours() - (23 - i))
-    hourStart.setMinutes(0)
-    hourStart.setSeconds(0)
-
-    const hourTicks = ticks.filter((t) => {
-      const tickHour = new Date(t.timestamp).getHours()
-      return tickHour === hourStart.getHours()
-    })
-
-    const avgResponseTime =
-      hourTicks.length > 0
-        ? Math.round(
-            hourTicks.reduce((sum, t) => sum + t.responseTime, 0) /
-              hourTicks.length
-          )
-        : 0
-
-    return {
-      time: hourStart.toLocaleTimeString('en-US', {
+  // Sort ticks by time (important)
+  const chartData = [...ticks]
+    .map((t) => ({
+      time: new Date(t.timestamp),
+      responseTime: t.responseTime,
+    }))
+    .sort((a, b) => a.time.getTime() - b.time.getTime())
+    .map((t) => ({
+      time: t.time.toLocaleTimeString('en-US', {
         hour: '2-digit',
         minute: '2-digit',
         hour12: false,
       }),
-      responseTime: avgResponseTime,
-    }
-  })
+      responseTime: t.responseTime,
+    }))
 
-  const maxResponseTime = Math.max(...chartData.map((d) => d.responseTime), 200)
+  const maxResponseTime = Math.max(
+    200,
+    ...chartData.map((d) => d.responseTime)
+  )
 
   return (
     <Card className="border-border bg-card p-6">
       <div className="mb-4">
-        <h3 className="text-lg font-semibold">Response Time (Last 24H)</h3>
-        <p className="text-sm text-muted-foreground">Average milliseconds per hour</p>
+        <h3 className="text-lg font-semibold">Response Time</h3>
+        <p className="text-sm text-muted-foreground">
+          One point per check (~3 minutes)
+        </p>
       </div>
 
       <ResponsiveContainer width="100%" height={300}>
-        <LineChart data={chartData} margin={{ top: 5, right: 10, left: 0, bottom: 5 }}>
+        <LineChart
+          data={chartData}
+          margin={{ top: 5, right: 10, left: 0, bottom: 5 }}
+        >
           <CartesianGrid strokeDasharray="3 3" stroke="hsl(var(--border))" />
+
           <XAxis
             dataKey="time"
             stroke="hsl(var(--muted-foreground))"
             style={{ fontSize: '12px' }}
-            interval={Math.floor(chartData.length / 6)}
+            interval="preserveStartEnd"
           />
+
           <YAxis
             stroke="hsl(var(--muted-foreground))"
             style={{ fontSize: '12px' }}
             domain={[0, maxResponseTime]}
-            label={{ value: 'Response Time (ms)', angle: -90, position: 'insideLeft' }}
+            label={{
+              value: 'Response Time (ms)',
+              angle: -90,
+              position: 'insideLeft',
+            }}
           />
+
           <Tooltip
             contentStyle={{
               backgroundColor: 'hsl(var(--card))',
@@ -84,8 +85,10 @@ export default function ResponseTimeChart({ ticks }: ResponseTimeChartProps) {
               borderRadius: '6px',
               color: 'hsl(var(--foreground))',
             }}
-            formatter={(value) => `${value}ms`}
+            formatter={(value) => `${value} ms`}
+            labelFormatter={(label) => `Time: ${label}`}
           />
+
           <Line
             type="monotone"
             dataKey="responseTime"

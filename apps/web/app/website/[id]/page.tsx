@@ -35,27 +35,27 @@ interface WebsiteDetailUI {
 }
 
 const mapApiToUI = (apiData: any): WebsiteDetailUI => {
-  const website = apiData.website_details[0];
-  const latestTick = website?.ticks?.[0];
+  const website = apiData;
+  const latestTick = apiData?.ticks?.[0];
 
   return {
-    id: website.id,
-    url: website.url,
+    id: website.website_details.id,
+    url: website.website_details.url,
     status: latestTick?.status ?? "Unknown",
 
-    avgResponseTime: apiData?.avg_response?._avg?.response_time_ms ?? 0,
+    avgResponseTime: apiData?.avg_response,
 
     ticks: website.ticks.map((tick: any) => ({
-      timestamp: new Date(tick.createdAt),
+      timestamp: new Date(tick.time),
       responseTime: tick.response_time_ms,
       status: tick.status,
-      region: tick.regain_id,
+      region: tick.region_id,
     })),
 
     regions: apiData.region_metrics.map((r: any) => ({
-      regionId: r.regain_id,
-      avgResponseTime: r._avg.response_time_ms,
-      totalChecks: r._count,
+      regionId: r.region_id,
+      avgResponseTime: r.avg_response,
+      totalChecks: r.checks,
     })),
   };
 };
@@ -154,7 +154,7 @@ export default function WebsiteDetailPage({
         {/* Charts */}
 
         <UptimeChart ticks={data.ticks} />
-        {/* <ResponseTimeChart ticks={data.ticks} /> */}
+        <ResponseTimeChart ticks={data.ticks} />
         {/* <RegionalStats regions={data.regions} /> */}
       </div>
     </main>
