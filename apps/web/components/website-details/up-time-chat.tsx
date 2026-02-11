@@ -11,82 +11,65 @@ import {
 } from 'recharts'
 import { Card } from '@repo/ui/components/card'
 
-interface Tick {
+type WebsiteStatus = 'Up' | 'down' | 'Unknown'
+
+interface TickUI {
   timestamp: Date
   responseTime: number
-  status: 'Up' | 'down' | 'Unknown'
+  status: WebsiteStatus
   region: string
 }
 
 interface UptimeChartProps {
-  ticks: Tick[]
+  ticks: TickUI[]
 }
 
 export default function UptimeChart({ ticks }: UptimeChartProps) {
-  // Convert ticks to hourly aggregates
+  const now = new Date()
+
   const chartData = Array.from({ length: 24 }, (_, i) => {
-    const hourStart = new Date()
-    hourStart.setHours(hourStart.getHours() - (23 - i))
-    hourStart.setMinutes(0)
-    hourStart.setSeconds(0)
+    const hour = new Date(now)
+    hour.setHours(now.getHours() - (23 - i), 0, 0, 0)
 
     const hourTicks = ticks.filter((t) => {
-      const tickHour = new Date(t.timestamp).getHours()
-      return tickHour === hourStart.getHours()
+      const d = new Date(t.timestamp)
+      return (
+        d.getHours() === hour.getHours() &&
+        d.toDateString() === hour.toDateString()
+      )
     })
 
-    const upCount = hourTicks.filter((t) => t.status === 'Up').length
-    const totalCount = hourTicks.length || 1
-    const uptime = (upCount / totalCount) * 100
+    const total = hourTicks.length
+    const up = hourTicks.filter((t) => t.status === 'Up').length
 
     return {
-      time: hourStart.toLocaleTimeString('en-US', {
+      time: hour.toLocaleTimeString('en-US', {
         hour: '2-digit',
         minute: '2-digit',
         hour12: false,
       }),
-      uptime: Math.round(uptime * 100) / 100,
+      uptime: total === 0 ? 0 : Math.round((up / total) * 100),
     }
   })
 
   return (
     <Card className="border-border bg-card p-6">
       <div className="mb-4">
-        <h3 className="text-lg font-semibold">Uptime (Last 24H)</h3>
-        <p className="text-sm text-muted-foreground">Hourly uptime percentage</p>
+        <h3 className="text-lg font-semibold">Uptime</h3>
       </div>
 
       <ResponsiveContainer width="100%" height={300}>
-        <LineChart data={chartData} margin={{ top: 5, right: 10, left: 0, bottom: 5 }}>
-          <CartesianGrid strokeDasharray="3 3" stroke="hsl(var(--border))" />
-          <XAxis
-            dataKey="time"
-            stroke="hsl(var(--muted-foreground))"
-            style={{ fontSize: '12px' }}
-            interval={Math.floor(chartData.length / 6)}
-          />
-          <YAxis
-            stroke="hsl(var(--muted-foreground))"
-            style={{ fontSize: '12px' }}
-            domain={[0, 100]}
-            label={{ value: 'Uptime %', angle: -90, position: 'insideLeft' }}
-          />
-          <Tooltip
-            contentStyle={{
-              backgroundColor: 'hsl(var(--card))',
-              border: '1px solid hsl(var(--border))',
-              borderRadius: '6px',
-              color: 'hsl(var(--foreground))',
-            }}
-            formatter={(value) => `${value}%`}
-          />
+        <LineChart data={chartData}>
+          <CartesianGrid strokeDasharray="3 3" />
+          <XAxis dataKey="time" />
+          <YAxis domain={[0, 100]} />
+          <Tooltip formatter={(v) => `${v}%`} />
           <Line
             type="monotone"
             dataKey="uptime"
-            stroke="hsl(120 100% 50%)"
+            stroke="#22c55e"
             strokeWidth={2}
             dot={false}
-            isAnimationActive={false}
           />
         </LineChart>
       </ResponsiveContainer>

@@ -17,7 +17,7 @@ interface Stats {
 
 interface WebsiteDetailHeaderProps {
   data: DetailData
-  stats: Stats
+  stats?: Stats
 }
 
 export default function WebsiteDetailHeader({

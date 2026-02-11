@@ -4,7 +4,7 @@ import { getWebsiteDetails, Website, getDashboardDetails } from "../controllers/
 const router: Router = Router();
 
 router.get("/website", getDashboardDetails);
-router.get("/status/:websiteId", getWebsiteDetails);
+router.get("/status", getWebsiteDetails);
 router.post("/website", Website);
 
 export default router;
