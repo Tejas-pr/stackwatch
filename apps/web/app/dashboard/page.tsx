@@ -4,7 +4,7 @@ import { useEffect, useState } from "react";
 import DashboardHeader from "../../components/dashboard/header";
 import WebsiteList from "../../components/dashboard/website-list";
 import AddWebsiteModal from "../../components/dashboard/add-website-model";
-import { getDashboardDetails } from "../../server";
+import { deleteWebsite, getDashboardDetails } from "../../server";
 
 export interface Website {
   id: string;
@@ -59,8 +59,10 @@ export default function DashboardPage() {
     setShowAddModal(false);
   };
 
-  const handleDeleteWebsite = (id: string) => {
+  const handleDeleteWebsite = async (id: string) => {
     setWebsites(websites.filter((w) => w.id !== id));
+    // const deleted = await deleteWebsite(id);
+    // console.log(">>>>>>>>>>",deleted);
   };
 
   const handleRefresh = () => {

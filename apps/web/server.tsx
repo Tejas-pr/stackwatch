@@ -36,3 +36,14 @@ export const getWebsiteDetail = async(websiteId: string, timeline: number) => {
         console.error(e)
     }
 }
+
+export const deleteWebsite = async(websiteId: string) => {
+    try {
+        const response = await axios.delete(`${BACKEND_URL}/website?websiteId=${websiteId}`,{
+            withCredentials: true
+        })
+        return response.data;
+    } catch (e) {
+        console.error(e)
+    }
+}

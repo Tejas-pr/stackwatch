@@ -176,3 +176,41 @@ export const Website = async (req: Request, res: Response) => {
         return res.status(500).json({ message: e.message });
     }
 }
+
+export const deleteWebsite = async (req: Request, res: Response) => {
+    try {
+        const website_id = String(req.query.websiteId);
+        const user_id = req.user_id;
+
+        if (!user_id) {
+            return res.status(400).json({
+                success: false,
+                message: "Unauthorized!"
+            });
+        }
+
+        if (!website_id) {
+            return res.status(400).json({
+                success: false,
+                message: "Provide website ID"
+            });
+        }
+
+        const deleted = await prisma.website.delete({
+            where: {
+                user_id,
+                id: website_id
+            }
+        })
+
+        if (deleted) {
+            return res.status(200).json({
+                success: true,
+                message: "successfully deleted!!",
+            });
+        }
+
+    } catch (e: any) {
+        return res.status(500).json({ message: e.message });
+    }
+}
