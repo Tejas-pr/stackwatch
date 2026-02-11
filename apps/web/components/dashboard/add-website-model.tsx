@@ -18,15 +18,11 @@ import { addNewWebsite } from "../../server";
 interface AddWebsiteModalProps {
   isOpen: boolean;
   onClose: () => void;
-  onAdd: (
-    website: Omit<Website, "id" | "status" | "lastChecked" | "responseTime">,
-  ) => void;
 }
 
 export default function AddWebsiteModal({
   isOpen,
   onClose,
-  onAdd,
 }: AddWebsiteModalProps) {
   const [name, setName] = useState("");
   const [url, setUrl] = useState("");
@@ -68,11 +64,10 @@ export default function AddWebsiteModal({
     const res = await addNewWebsite(url);
 
     if (res.success) {
-      onAdd(res.response)
       setName("");
       setUrl("");
       setErrors({});
-      onClose()
+      onClose();
     }
   };
 

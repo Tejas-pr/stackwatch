@@ -31,7 +31,6 @@ export default function DashboardPage() {
     const data = await getDashboardDetails();
     const dashboard = data.data;
 
-    console.log(dashboard.websites);
     setWebsites(dashboard.websites);
     setHeaderData({
       totalSites: dashboard.totalSites,
@@ -82,7 +81,6 @@ export default function DashboardPage() {
         <AddWebsiteModal
           isOpen={showAddModal}
           onClose={() => setShowAddModal(false)}
-          onAdd={handleAddWebsite}
         />
       </div>
     </main>

@@ -68,7 +68,6 @@ export default function x({ websites, onDelete }: WebsiteListProps) {
             <TableBody>
               {websites.map((website) => {
                 const latestTick = website.ticks?.[0];
-
                 return (
                   <TableRow
                     key={website.id}
@@ -112,28 +111,32 @@ export default function x({ websites, onDelete }: WebsiteListProps) {
                             : "bg-destructive/20 text-destructive border-destructive/30"
                         }
                       >
-                        {latestTick?.status === "Up"
-                          ? "Online"
-                          : "Offline"}
+                        {latestTick?.status === "Up" ? "Online" : "Offline"}
                       </Badge>
                     </TableCell>
 
                     <TableCell className="text-right py-4">
-                      <div className="font-semibold">
-                        {website.ticks[0].response_time_ms}ms
-                      </div>
-                      <div className="text-xs text-muted-foreground">
-                        {website.ticks[0].response_time_ms < 100
-                          ? "Fast"
-                          : "Normal"}
-                      </div>
+                      {latestTick ? (
+                        <>
+                          <div className="font-semibold">
+                            {latestTick.response_time_ms}ms
+                          </div>
+                          <div className="text-xs text-muted-foreground">
+                            {latestTick.response_time_ms < 100
+                              ? "Fast"
+                              : "Normal"}
+                          </div>
+                        </>
+                      ) : (
+                        <div className="text-xs text-muted-foreground">—</div>
+                      )}
                     </TableCell>
 
                     <TableCell className="text-right py-4">
                       <div className="flex items-center justify-end gap-2 text-sm">
                         <Clock className="h-4 w-4 text-muted-foreground" />
                         <span className="text-muted-foreground">
-                          {formatTime(website.ticks[0].createdAt)}
+                          {latestTick ? formatTime(latestTick.createdAt) : "—"}
                         </span>
                       </div>
                     </TableCell>

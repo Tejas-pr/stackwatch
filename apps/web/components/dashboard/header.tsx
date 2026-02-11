@@ -3,6 +3,8 @@
 import { Button } from "@repo/ui/components/button";
 import { RefreshCw, Plus, Monitor } from "lucide-react";
 import { Skeleton } from "@repo/ui/components/skeleton";
+import SignOut from "../signout";
+
 interface DashboardHeaderProps {
   onRefresh: () => void;
   onAddWebsite: () => void;
@@ -34,10 +36,10 @@ export default function DashboardHeader({
           </div>
           <p className="text-muted-foreground max-w-lg">
             Real-time uptime monitoring and performance tracking for your
-            websites. Stay informed about your services' health.
+            websites every 3 minutes. Stay informed about your services' health.
           </p>
         </div>
-        <div className="flex w-full gap-3 sm:w-auto sm:flex-col md:flex-row">
+        <div className="flex items-center justify-center w-full gap-3 sm:w-auto sm:flex-col md:flex-row">
           <Button
             onClick={onRefresh}
             variant="outline"
@@ -51,6 +53,9 @@ export default function DashboardHeader({
             <Plus className="h-4 w-4" />
             Add Website
           </Button>
+          <div className="gap-2">
+            <SignOut />
+          </div>
         </div>
       </div>
 
@@ -70,7 +75,7 @@ export default function DashboardHeader({
             <p className="text-xs font-medium uppercase tracking-wider text-muted-foreground">
               Average Uptime
             </p>
-            <p className="mt-1 text-2xl font-bold text-accent">
+            <p className="mt-1 text-2xl font-bold text-foreground">
               {headerData ? headerData.averageUptime : "—"}
             </p>
           </div>
