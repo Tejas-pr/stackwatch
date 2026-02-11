@@ -1,23 +1,153 @@
 # StackWatch
 
-StackWatch is an all-in-one observability platform inspired by **Better Stack** for monitoring logs, uptime, and application performance.
+StackWatch is an all-in-one observability platform inspired by **Better Stack** for monitoring logs, uptime, and application performance. It allows you to track your services, visualize metrics, and get alerted when things go wrong.
 
-## 📦 Status
+![Architecture](./architecture/stackwatch-architecture.excalidraw.png)
 
-This project is currently under active development.
+## 🚀 Features
 
-## 🎯 Goal
+- **Uptime Monitoring**: Global latency and uptime tracking from multiple regions.
+- **Log Management**: Centralized logging for easy debugging and auditing.
+- **Performance Tracking**: Monitor application performance metrics.
+- **Real-time Alerts**: Get notified immediately when incidents occur.
+- **Monorepo Architecture**: specific separation of concerns between API, Dashboard, and Workers.
 
-To build a production-ready observability platform while learning system monitoring, logging, and performance tracking.
+## 📦 Services Overview
 
-## 🎯 Architecture
+This project is organized as a monorepo using **TurboRepo**.
 
-<img src="./architecture/stackwatch-architecture.excalidraw.png" >
+| Service            | Path                  | Description                                                      | Stack                                    |
+| :----------------- | :-------------------- | :--------------------------------------------------------------- | :--------------------------------------- |
+| **Web Dashboard**  | `apps/web`            | The administrative interface for viewing metrics and logs.       | Next.js, React, TailwindCSS, Better Auth |
+| **API Server**     | `apps/api`            | The core REST API handling user requests and logic.              | Node.js, Express, Prisma                 |
+| **Worker Service** | `apps/worker-service` | Background service that performs the actual uptime checks/pings. | Node.js, Redis (Queue), TimescaleDB      |
+| **Pusher Service** | `apps/pusher-service` | Handles real-time data pushes and interval-based events.         | Node.js, Redis, WebSockets (implied)     |
+| **Packages**       | `packages/*`          | Shared libraries for DB schemata, UI components, and configs.    | TypeScript, Prisma, ESLint               |
+
+## 🛠️ Tech Stack
+
+- **Package Manager**: `bun`
+- **Monorepo**: TurboRepo
+- **Database (Relational)**: PostgreSQL
+- **Database (Time-Series)**: TimescaleDB
+- **ORM**: Prisma
+- **Authentication**: Better Auth
+
+## ⚙️ Environment Variables
+
+To run the application, you need to configure environment variables for each service.
+
+### Common Variables
+
+These are used across multiple services (Web, API).
+
+```env
+DATABASE_URL="postgresql://postgres:stackwatch@localhost:5434/stackwatch"
+BETTER_AUTH_SECRET="your_generated_secret"
+BETTER_AUTH_URL="http://localhost:3000"
+BACKEND_PORT=3001
+BACKEND_URL="http://localhost:3001/api"
+```
+
+### Service-Specific Variables
+
+#### Worker Service (`apps/worker-service/.env`)
+
+Configuration for the monitoring agents.
+
+```env
+REGION_ID="region_usa"       # Identifier for the monitoring region (must match DB)
+WORKER_ID="usa:worker:01"    # Unique ID for this specific worker instance
+DATABASE_URL="..."           # Same as common
+BACKEND_PORT=3001
+```
+
+#### Pusher Service (`apps/pusher-service/.env`)
+
+Configuration for real-time updates.
+
+```env
+REGION_ID="region_usa"
+WORKER_ID="usa:worker:01"
+DATABASE_URL="..."
+BACKEND_PORT=3001
+TIME_INTERVAL=3              # Interval in seconds for push events
+```
+
+#### API Production Ops (Optional)
+
+For production deployment, the API supports additional CORS configurations:
+
+- `MAINORIGINS`: Primary allowed origin.
+- `MAINORIGINS2`: Secondary allowed origin.
+
+## ⚡ Getting Started
+
+### Prerequisites
+
+- [Bun](https://bun.sh/)
+- [Docker](https://www.docker.com/) (for databases)
+
+### 1. Start Infrastructure
+
+Start the required databases (PostgreSQL and TimescaleDB).
+
+**TimescaleDB (Metrics):**
+
+```bash
+docker run -d -p 5435:5432 --name stackwatch-timescale \
+  -e POSTGRES_USER=tsdb \
+  -e POSTGRES_DB=metrics \
+  -e POSTGRES_PASSWORD=tsdb \
+  -v ts_data:/var/lib/postgresql/data \
+  timescale/timescaledb:latest-pg16
+```
+
+**PostgreSQL (Application Data):**
+Ensure your main Postgres instance is running on port **5434** (as per your `.env`) or update the `DATABASE_URL` to match your local setup.
+
+### 2. Install Dependencies
+
+```bash
+bun install
+```
+
+### 3. Database Setup
+
+Initialize the schema and push changes to the database.
+
+```bash
+bun run db:push
+# or
+bun run db:migrate:dev
+```
+
+### 4. Configure Environment
+
+Create `.env` files in `apps/web/`, `apps/api/`, `apps/worker-service/`, and `apps/pusher-service/` with the values described in the [Environment Variables](#-environment-variables) section above.
+
+### 5. Run Development Server
+
+Start all applications simultaneously:
+
+```bash
+bun run dev
+```
+
+This will launch:
+
+- **Web**: `http://localhost:3000`
+- **API**: `http://localhost:3001`
+- **Workers**: Background processes
+
+## 🚧 Roadmap & In Progress
+
+The following items are currently under active development:
+
+- **CI/CD Pipelines**: Github Actions workflows for automated testing and deployment.
+- **Docker Orchestration**: Full `docker-compose.yml` to spin up the entire stack (App + DBs) with a single command.
+- **Enhanced Alerting**: Integrations with Slack/Email/SMS.
 
 ---
 
 Inspired by [Better Stack](https://betterstack.com/)
-
-## timeseries database
-
-docker run -d -p 5435:5432 --name stackwatch-timescale -e POSTGRES_USER=tsdb -e POSTGRES_DB=metrics -e POSTGRES_PASSWORD=tsdb -v ts_data:/var/lib/postgresql/data timescale/timescaledb:latest-pg16
