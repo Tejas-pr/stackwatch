@@ -1,145 +1,87 @@
 import { prisma } from "@repo/database";
+import { getAverageResponse, getLatestTick, getRecentTicks, getRegionMetrics, getUptimeStats } from "@repo/timeseries-database/timeseries";
 import type { Request, Response } from "express";
 
 export const getDashboardDetails = async (req: Request, res: Response) => {
-    try {
-        const user_id = req.user_id
-        if (!user_id) {
-            return res.status(401).json({ success: false, message: "Unauthorized" })
-        }
+    const user_id = req.user_id;
+    if (!user_id) return res.status(401).json({ success: false });
 
-        const [totalSites, websites, totalTicks, upTicks] = await Promise.all([
-            prisma.website.count({ where: { user_id } }),
+    const websites = await prisma.website.findMany({
+        where: { user_id },
+        select: { id: true, url: true, timeAdded: true }
+    });
 
-            prisma.website.findMany({
-                where: { user_id },
-                select: {
-                    id: true,
-                    url: true,
-                    timeAdded: true,
-                    ticks: {
-                        take: 1,
-                        orderBy: { createdAt: "desc" },
-                        select: {
-                            status: true,
-                            response_time_ms: true,
-                            createdAt: true
-                        }
-                    }
-                }
-            }),
-
-            prisma.websiteTicks.count({
-                where: { website: { user_id } }
-            }),
-
-            prisma.websiteTicks.count({
-                where: { website: { user_id }, status: "Up" }
-            })
-        ])
-
-        const averageUptime =
-            totalTicks === 0 ? 0 : Number(((upTicks / totalTicks) * 100).toFixed(2))
-
-        const issues = websites.filter(
-            w => w.ticks[0]?.status === "down"
-        ).length
-
-        return res.json({
-            success: true,
-            data: {
-                totalSites,
-                averageUptime,
-                issues,
-                websites
-            }
+    const enriched = await Promise.all(
+        websites.map(async (w) => {
+            const latest = await getLatestTick(w.id);
+            return {
+                ...w,
+                latest
+            };
         })
-    } catch (e: any) {
-        return res.status(500).json({ message: e.message })
-    }
-}
+    );
+
+    const uptimeValues = await Promise.all(
+        websites.map(w => getUptimeStats(w.id))
+    );
+
+    const averageUptime =
+        uptimeValues.length === 0
+            ? 0
+            : Number(
+                (
+                    uptimeValues.reduce((a, b) => a + b, 0) /
+                    uptimeValues.length
+                ).toFixed(2)
+            );
+
+    const issues = enriched.filter(
+        w => w.latest?.status === "Down"
+    ).length;
+
+    res.json({
+        success: true,
+        data: {
+            totalSites: websites.length,
+            averageUptime,
+            issues,
+            websites: enriched
+        }
+    });
+};
 
 export const getWebsiteDetails = async (req: Request, res: Response) => {
-    try {
-        const user_id = req.user_id;
-        const website_id = String(req.query.websiteId);
-        const time_line = Number(req.query.timeline) || 1;
+    const user_id = req.user_id;
+    const website_id = String(req.query.websiteId);
+    const timeline = Number(req.query.timeline) || 50;
 
-        if (!user_id) {
-            return res.status(400).json({
-                success: false,
-                message: "Unauthorized!"
-            });
-        }
-
-        if (!website_id) {
-            return res.status(400).json({
-                success: false,
-                message: "Provide website ID"
-            });
-        }
-
-        if (time_line > 500) {
-            return res.status(400).json({
-                success: false,
-                message: "timeline is huge, Please reduce the time line!!"
-            });
-        }
-
-        const avg_response = await prisma.websiteTicks.aggregate({
-            where: {
-                website_id
-            },
-            _avg: {
-                response_time_ms: true
-            }
-        });
-
-        const region_metrics = await prisma.websiteTicks.groupBy({
-            by: ["regain_id"],
-            where: {
-                website_id
-            },
-            _avg: {
-                response_time_ms: true
-            },
-            _count: true
-        });
-
-        const response = await prisma.website.findMany({
-            where: {
-                user_id,
-                id: website_id
-            },
-            include: {
-                ticks: {
-                    take: time_line,
-                    orderBy: [
-                        {
-                            createdAt: "desc"
-                        }
-                    ]
-                }
-            }
-        });
-
-        if (!response) {
-            res.status(200).json({
-                success: true,
-                message: "Not found!!"
-            });
-        }
-
-        res.status(200).json({
-            success: true,
-            website_details: response,
-            avg_response,
-            region_metrics
-        });
-    } catch (e: any) {
-        return res.status(500).json({ message: e.message });
+    if (!user_id || !website_id) {
+        return res.status(400).json({ success: false });
     }
-}
+
+    // ownership check (IMPORTANT)
+    const website = await prisma.website.findFirst({
+        where: { id: website_id, user_id }
+    });
+
+    if (!website) {
+        return res.status(404).json({ success: false });
+    }
+
+    const [avg_response, region_metrics, ticks] = await Promise.all([
+        getAverageResponse(website_id),
+        getRegionMetrics(website_id),
+        getRecentTicks(website_id, timeline)
+    ]);
+
+    res.json({
+        success: true,
+        website_details: website,
+        avg_response,
+        region_metrics,
+        ticks
+    });
+};
 
 export const Website = async (req: Request, res: Response) => {
     try {

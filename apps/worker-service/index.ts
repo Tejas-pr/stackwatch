@@ -1,7 +1,7 @@
 // here I need to pick the websites from q and ping and put the status into the DB(bulk).
 import axios from "axios";
-import { prisma } from "@repo/database";
 import { ensureConsumerGroup, XAckBulk, XReadGroup } from "@repo/redis-queue/redis-client";
+import { insertWebsiteTick } from "@repo/timeseries-database/timeseries";
 
 const REGION_ID = process.env.REGION_ID!;
 const WORKER_ID = process.env.WORKER_ID!;
@@ -39,26 +39,24 @@ async function fetchWebsite(url: string, website_id: string) {
             axios.get(url)
                 .then(async () => {
                     const end_time = Date.now();
-                    await prisma.websiteTicks.create({
-                        data: {
-                            response_time_ms: end_time - start_time,
-                            status: "Up",
-                            regain_id: REGION_ID,
-                            website_id
-                        }
-                    });
+                    const response_time_ms = end_time - start_time;
+                    await insertWebsiteTick({
+                        websiteId: website_id,
+                        regionId: REGION_ID,
+                        responseTime: response_time_ms,
+                        status: "Up"
+                    })
                     resolve();
                 })
                 .catch(async () => {
                     const end_time = Date.now();
-                    await prisma.websiteTicks.create({
-                        data: {
-                            response_time_ms: end_time - start_time,
-                            status: "down",
-                            regain_id: REGION_ID,
-                            website_id
-                        }
-                    });
+                    const response_time_ms = end_time - start_time;
+                    await insertWebsiteTick({
+                        websiteId: website_id,
+                        regionId: REGION_ID,
+                        responseTime: response_time_ms,
+                        status: "Down"
+                    })
                     resolve();
                 })
         })

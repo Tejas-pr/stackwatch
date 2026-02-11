@@ -10,7 +10,8 @@
   "dependencies": {
     "@repo/database": "*",
     "@repo/redis-queue": "*",
-    "axios": "^1.13.5"
+    "axios": "^1.13.5",
+    "@repo/timeseries-database": "*"
   },
   "devDependencies": {
     "@types/bun": "latest"

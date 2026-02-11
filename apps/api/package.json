@@ -18,6 +18,7 @@
     "@repo/database": "*",
     "@types/express": "^5.0.6",
     "express": "^5.2.1",
-    "express-rate-limit": "^8.2.1"
+    "express-rate-limit": "^8.2.1",
+    "@repo/timeseries-database": "*"
   }
 }

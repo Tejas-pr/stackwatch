@@ -14,3 +14,7 @@ To build a production-ready observability platform while learning system monitor
 ---
 
 Inspired by [Better Stack](https://betterstack.com/)
+
+
+## timeseries database
+docker run -d -p 5435:5432 --name stackwatch-timescale -e POSTGRES_USER=tsdb -e POSTGRES_DB=metrics -e POSTGRES_PASSWORD=tsdb -v ts_data:/var/lib/postgresql/data timescale/timescaledb:latest-pg16

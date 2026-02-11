@@ -3,6 +3,7 @@ import { prisma } from "@repo/database";
 import { XAddBulk } from "@repo/redis-queue/redis-client";
 
 const TIME_INTERVAL = process.env.TIME_INTERVAL || 3;
+// 1000 * 60 * Number(TIME_INTERVAL)
 
 async function fetch() {
     const websites = await prisma.website.findMany({
