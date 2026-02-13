@@ -5,7 +5,8 @@
   "private": true,
   "scripts": {
     "dev": "bun run index.ts",
-    "start": "bun run index.ts"
+    "start": "bun run index.ts",
+    "start:bootstrap": "bun run bootstrap-timescale.ts"
   },
   "dependencies": {
     "@repo/database": "*",

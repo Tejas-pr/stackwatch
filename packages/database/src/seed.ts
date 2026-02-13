@@ -1,4 +1,4 @@
-import { prisma, WebsiteStatus } from "./client";
+import { prisma } from "./client";
 require("dotenv").config();
 
 async function main() {
@@ -37,15 +37,6 @@ async function main() {
       id: "site_google",
       url: "https://google.com",
       user_id: user.id
-    }
-  });
-
-  await prisma.websiteTicks.create({
-    data: {
-      website_id: google.id,
-      regain_id: usa.id,
-      response_time_ms: 120,
-      status: WebsiteStatus.Up
     }
   });
 

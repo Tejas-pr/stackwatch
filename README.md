@@ -92,6 +92,15 @@ Start the required databases (PostgreSQL and TimescaleDB).
 **TimescaleDB (Metrics):**
 
 ```bash
+docker run -d \
+  -p 5434:5432 \
+  -e POSTGRES_USER=postgres \
+  -e POSTGRES_PASSWORD=stackwatch \
+  -e POSTGRES_DB=stackwatch \
+  -v stackwatch_pgdata:/var/lib/postgresql/data \
+  --name stackwatch \
+  postgres
+
 docker run -d -p 5435:5432 --name stackwatch-timescale \
   -e POSTGRES_USER=tsdb \
   -e POSTGRES_DB=metrics \
