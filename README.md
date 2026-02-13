@@ -21,8 +21,7 @@ This project is organized as a monorepo using **TurboRepo**.
 | **Web Dashboard**  | `apps/web`            | The administrative interface for viewing metrics and logs.       | Next.js, React, TailwindCSS, Better Auth |
 | **API Server**     | `apps/api`            | The core REST API handling user requests and logic.              | Node.js, Express, Prisma                 |
 | **Worker Service** | `apps/worker-service` | Background service that performs the actual uptime checks/pings. | Node.js, Redis (Queue), TimescaleDB      |
-| **Pusher Service** | `apps/pusher-service` | Handles real-time data pushes and interval-based events.         | Node.js, Redis, WebSockets (implied)     |
-| **Packages**       | `packages/*`          | Shared libraries for DB schemata, UI components, and configs.    | TypeScript, Prisma, ESLint               |
+| **Pusher Service** | `apps/pusher-service` | Handles real-time data pushes and interval-based events.         | Node.js, Redis,               |
 
 ## 🛠️ Tech Stack
 
@@ -151,3 +150,10 @@ The following items are currently under active development:
 ---
 
 Inspired by [Better Stack](https://betterstack.com/)
+
+### TODO:
+1. Refresh token and access token.
+2. Docker and docker compose files.
+3. Email trigger service.
+4. Write tests.
+5. Notification service.

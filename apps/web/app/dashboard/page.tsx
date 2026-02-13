@@ -4,7 +4,7 @@ import { useEffect, useState } from "react";
 import DashboardHeader from "../../components/dashboard/header";
 import WebsiteList from "../../components/dashboard/website-list";
 import AddWebsiteModal from "../../components/dashboard/add-website-model";
-import { deleteWebsite, getDashboardDetails } from "../../server";
+import { deleteWebsite, getDashboardDetails } from "../../lib/server";
 
 export interface Website {
   id: string;

@@ -5,7 +5,7 @@ import Link from "next/link";
 import { ArrowLeft } from "lucide-react";
 import { Button } from "@repo/ui/components/button";
 import { Card } from "@repo/ui/components/card";
-import { getWebsiteDetail } from "../../../server";
+import { getWebsiteDetail } from "../../../lib/server";
 import UptimeChart from "../../../components/website-details/up-time-chat";
 import ResponseTimeChart from "../../../components/website-details/response-chart";
 import RegionalStats from "../../../components/website-details/regional-status";
