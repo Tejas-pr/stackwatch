@@ -49,36 +49,34 @@ BACKEND_URL="http://localhost:3001/api"
 ```
 
 ### Service-Specific Variables
-
-#### Worker Service (`apps/worker-service/.env`)
-
 Configuration for the monitoring agents.
 
 ```env
-REGION_ID="region_usa"       # Identifier for the monitoring region (must match DB)
-WORKER_ID="usa:worker:01"    # Unique ID for this specific worker instance
-DATABASE_URL="..."           # Same as common
+MAINORIGINS=
+MAINORIGINS2=
+
 BACKEND_PORT=3001
-```
+BACKEND_URL=http://localhost:3001/api
 
-#### Pusher Service (`apps/pusher-service/.env`)
+DATABASE_URL="postgresql://postgres:stackwatch@localhost:5434/stackwatch"
 
-Configuration for real-time updates.
+BETTER_AUTH_SECRET=H1Tu2QUjxpt94vRIkxEz5kHUFOVGXGGP
+BETTER_AUTH_URL=http://localhost:3000
 
-```env
+STREAM_NAME=stackwatch:websites
+COUNT=5
+
+HOST=localhost
+PORT=5435
+DATABASE_NAME=metrics
+USERNAME_NAME=tsdb
+PASSWORD_NAME=tsdb
+MAX=10
+
+TIME_INTERVAL=3
 REGION_ID="region_usa"
 WORKER_ID="usa:worker:01"
-DATABASE_URL="..."
-BACKEND_PORT=3001
-TIME_INTERVAL=3              # Interval in seconds for push events
 ```
-
-#### API Production Ops (Optional)
-
-For production deployment, the API supports additional CORS configurations:
-
-- `MAINORIGINS`: Primary allowed origin.
-- `MAINORIGINS2`: Secondary allowed origin.
 
 ## ⚡ Getting Started
 
