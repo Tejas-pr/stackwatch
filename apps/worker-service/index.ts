@@ -4,6 +4,7 @@ import { ensureConsumerGroup, XAckBulk, XReadGroup, redisOptions, getValue, setV
 import { insertWebsiteTick } from "@repo/timeseries-database/timeseries";
 import { Queue } from "bullmq";
 import fs from "fs";
+import { prisma } from "@repo/database";
 
 const queueName = process.env.QUEUENAME || "stackwatch-email-queue";
 const emailQueue = new Queue(queueName, { connection: redisOptions });
@@ -18,6 +19,29 @@ if (!REGION_ID) {
 
 if (!WORKER_ID) {
     throw new Error("Worker not provided");
+}
+
+async function getEmail(websiteId: string) {
+    const cacheKey = `email_cache:${websiteId}`;
+    const cachedEmail = await getValue(cacheKey);
+    if (cachedEmail) return cachedEmail;
+
+    const website = await prisma.website.findUnique({
+        where: {
+            id: websiteId
+        },
+        include: {
+            user: true
+        }
+    })
+    
+    const email = website?.user.email;
+
+    if (email) {
+        await setValue(cacheKey, email, 60 * 60 * 24);
+    }
+
+    return email;
 }
 
 async function main() {
@@ -72,12 +96,18 @@ async function fetchWebsite(url: string, website_id: string) {
                         const template = await fs.promises.readFile("./email.template.html", "utf-8");
                         const html = template.replace(/{{url}}/g, url).replace(/{{time}}/g, new Date().toLocaleString());
                         
-                        await emailQueue.add("email", {
-                            to: "100xtejasworkspace@gmail.com",
-                            subject: `Alert: ${url} is Down`,
-                            body: `Your website ${url} is currently down. Checked at ${new Date().toISOString()}`,
-                            html
-                        });
+                        const email = await getEmail(website_id);
+                        if (email) {
+                            await emailQueue.add("email", {
+                                to: email,
+                                subject: `Alert: ${url} is Down`,
+                                body: `Your website ${url} is currently down. Checked at ${new Date().toISOString()}`,
+                                html
+                            });
+                            console.log(`Alert email sent to ${email} for ${url}`);
+                        } else {
+                            console.log(`No email found for website ${website_id}`);
+                        }
 
                         await setValue(dedupeKey, "sent", emailIntervalTime);
                     }

@@ -18,11 +18,13 @@ import { addNewWebsite } from "../../lib/server";
 interface AddWebsiteModalProps {
   isOpen: boolean;
   onClose: () => void;
+  onWebsiteAdded: (website: any) => void;
 }
 
 export default function AddWebsiteModal({
   isOpen,
   onClose,
+  onWebsiteAdded,
 }: AddWebsiteModalProps) {
   const [name, setName] = useState("");
   const [url, setUrl] = useState("");
@@ -64,6 +66,7 @@ export default function AddWebsiteModal({
     const res = await addNewWebsite(url);
 
     if (res.success) {
+      onWebsiteAdded(res.response);
       setName("");
       setUrl("");
       setErrors({});

@@ -110,7 +110,7 @@ export const Website = async (req: Request, res: Response) => {
         });
 
         return res.status(200).json({
-            success: "true",
+            success: true,
             message: "Successfully added the url!!",
             response
         })

@@ -14,7 +14,6 @@ const worker = new Worker<EmailJobData>(
   queueName,
   async (job: Job<EmailJobData>) => {
     const { to, subject, body, html } = job.data;
-    console.log(job.data);
 
     try {
       await sendEmail({

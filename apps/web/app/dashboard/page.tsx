@@ -44,24 +44,37 @@ export default function DashboardPage() {
     fetch();
   }, []);
 
-  const handleAddWebsite = (
-    website: Omit<Website, "id" | "status" | "lastChecked" | "responseTime">,
-  ) => {
+  const handleAddWebsite = (website: any) => {
     const newWebsite: Website = {
-      ...website,
-      id: Date.now().toString(),
-      status: "up",
+      id: website.id,
+      name: website.url, // Fallback to URL as name
+      url: website.url,
+      status: "up", // Default status
+      uptime: 100, // Default uptime
       lastChecked: new Date(),
-      responseTime: Math.floor(Math.random() * 300) + 50,
+      responseTime: 0, // Default response time
+      ticks: [],
     };
     setWebsites([...websites, newWebsite]);
     setShowAddModal(false);
   };
 
   const handleDeleteWebsite = async (id: string) => {
+    // Optimistic update
+    const previousWebsites = [...websites];
     setWebsites(websites.filter((w) => w.id !== id));
-    // const deleted = await deleteWebsite(id);
-    // console.log(">>>>>>>>>>",deleted);
+
+    try {
+      const res = await deleteWebsite(id);
+      if (!res?.success) {
+        // Revert if failed
+        setWebsites(previousWebsites);
+        console.error("Failed to delete website");
+      }
+    } catch (error) {
+      setWebsites(previousWebsites);
+      console.error("Error deleting website:", error);
+    }
   };
 
   const handleRefresh = () => {
@@ -81,6 +94,7 @@ export default function DashboardPage() {
         <AddWebsiteModal
           isOpen={showAddModal}
           onClose={() => setShowAddModal(false)}
+          onWebsiteAdded={handleAddWebsite}
         />
       </div>
     </main>
