@@ -1,5 +1,5 @@
 {
-  "name": "@repo/redis-queue",
+  "name": "@repo/common",
   "module": "index.ts",
   "type": "module",
   "private": true,
@@ -10,9 +10,10 @@
     "typescript": "^5"
   },
   "dependencies": {
-    "redis": "^5.10.0"
+    "@types/nodemailer": "^7.0.9",
+    "nodemailer": "^8.0.1"
   },
   "exports": {
-    ".": "./index.ts"
+    "./email": "./email.ts"
   }
 }

@@ -16,7 +16,11 @@ type MessageType = {
 const STREAM_NAME = process.env.STREAM_NAME || "stackwatch:websites";
 const COUNT = process.env.COUNT || 5;
 
-const client = await createClient()
+export const redisOptions = {
+    url: process.env.REDIS_URL || "redis://localhost:6379",
+}
+
+const client = await createClient(redisOptions)
     .on("error", (err) => console.log("Redis Client Error: ", err))
     .connect();
 
