@@ -24,6 +24,27 @@ const client = await createClient(redisOptions)
     .on("error", (err) => console.log("Redis Client Error: ", err))
     .connect();
 
+export const setValue = async (key: string, value: string, ttlSeconds?: number) => {
+    try {
+        await client.set(key, value);
+        if (ttlSeconds) {
+            await client.expire(key, ttlSeconds);
+        }
+    } catch (e) {
+        console.error(e);
+    }
+}
+
+export const getValue = async (key: string) => {
+    try {
+        const value = await client.get(key);
+        return value;
+    } catch (e) {
+        console.error(e);
+        return null;
+    }
+}
+
 export const XAddBulk = async (websites: Website[]) => {
     try {
         for (let i = 0; i < websites.length; i++) {

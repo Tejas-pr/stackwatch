@@ -79,7 +79,7 @@ export default function x({ websites, onDelete }: any) {
                       <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-secondary/50">
                         <Circle
                           className={`h-5 w-5 transition-all ${
-                            website.latest.status === "Up"
+                            website.latest?.status === "Up"
                               ? "fill-accent text-accent"
                               : "fill-destructive text-destructive"
                           }`}

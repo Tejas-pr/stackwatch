@@ -108,6 +108,7 @@
         "@repo/redis-queue": "*",
         "@repo/timeseries-database": "*",
         "axios": "^1.13.5",
+        "bullmq": "^5.69.2",
       },
       "devDependencies": {
         "@types/bun": "latest",

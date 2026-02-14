@@ -3,7 +3,6 @@ import { redisOptions } from "@repo/redis-queue";
 import { sendEmail } from "@repo/common/email";
 
 const queueName = process.env.QUEUENAME || "stackwatch-email-queue";
-
 interface EmailJobData {
   to: string;
   subject: string;
@@ -15,6 +14,7 @@ const worker = new Worker<EmailJobData>(
   queueName,
   async (job: Job<EmailJobData>) => {
     const { to, subject, body, html } = job.data;
+    console.log(job.data);
 
     try {
       await sendEmail({

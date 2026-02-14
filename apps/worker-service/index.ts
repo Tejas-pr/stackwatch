@@ -1,10 +1,16 @@
 // here I need to pick the websites from q and ping and put the status into the DB(bulk).
 import axios from "axios";
-import { ensureConsumerGroup, XAckBulk, XReadGroup } from "@repo/redis-queue";
+import { ensureConsumerGroup, XAckBulk, XReadGroup, redisOptions, getValue, setValue } from "@repo/redis-queue";
 import { insertWebsiteTick } from "@repo/timeseries-database/timeseries";
+import { Queue } from "bullmq";
+import fs from "fs";
+
+const queueName = process.env.QUEUENAME || "stackwatch-email-queue";
+const emailQueue = new Queue(queueName, { connection: redisOptions });
 
 const REGION_ID = process.env.REGION_ID!;
 const WORKER_ID = process.env.WORKER_ID!;
+const emailIntervalTime = Number(process.env.EMAILINTERVALTIME || 900);
 
 if (!REGION_ID) {
     throw new Error("Region not provided");
@@ -57,6 +63,25 @@ async function fetchWebsite(url: string, website_id: string) {
                         responseTime: response_time_ms,
                         status: "Down"
                     })
+
+                    // Check if we already sent an email for this website recently
+                    const dedupeKey = `alert:timestamp:v2:${website_id}`;
+                    const existingAlert = await getValue(dedupeKey);
+
+                    if (existingAlert !== "sent") {
+                        const template = await fs.promises.readFile("./email.template.html", "utf-8");
+                        const html = template.replace(/{{url}}/g, url).replace(/{{time}}/g, new Date().toLocaleString());
+                        
+                        await emailQueue.add("email", {
+                            to: "100xtejasworkspace@gmail.com",
+                            subject: `Alert: ${url} is Down`,
+                            body: `Your website ${url} is currently down. Checked at ${new Date().toISOString()}`,
+                            html
+                        });
+
+                        await setValue(dedupeKey, "sent", emailIntervalTime);
+                    }
+
                     resolve();
                 })
         })

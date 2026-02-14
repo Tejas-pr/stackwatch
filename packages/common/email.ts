@@ -2,8 +2,7 @@ import nodemailer from "nodemailer";
 
 function validateEmailEnv() {
   const required = [
-    "EMAIL_SERVICE_HOST",
-    "EMAIL_SERVICE_PORT",
+    "EMAIL_SERVICE",
     "EMAIL_SERVICE_USER",
     "EMAIL_SERVICE_PASS",
   ];
@@ -19,12 +18,10 @@ function createTransporter() {
   validateEmailEnv();
 
   return nodemailer.createTransport({
-    host: process.env.EMAIL_SERVICE_HOST!,
-    port: Number(process.env.EMAIL_SERVICE_PORT),
-    secure: Number(process.env.EMAIL_SERVICE_PORT) === 465,
+    service: process.env.EMAIL_SERVICE,
     auth: {
-      user: process.env.EMAIL_SERVICE_USER!,
-      pass: process.env.EMAIL_SERVICE_PASS!,
+      user: process.env.EMAIL_SERVICE_USER,
+      pass: process.env.EMAIL_SERVICE_PASS,
     },
   });
 }
@@ -53,14 +50,14 @@ export async function sendEmail({
 
   try {
     const info = await transporter.sendMail({
-      from:
-        from ??
-        `"No Reply" <${process.env.EMAIL_SERVICE_USER}>`,
+      from: from ?? `"No Reply" <${process.env.EMAIL_SERVICE_USER}>`,
       to: Array.isArray(to) ? to.join(",") : to,
       subject,
       text,
       html,
     });
+
+    console.log("Email sent successfully:", info.messageId);
 
     return {
       success: true,

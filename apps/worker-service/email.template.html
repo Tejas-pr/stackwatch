@@ -1,0 +1,217 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="color-scheme" content="light dark">
+    <meta name="supported-color-schemes" content="light dark">
+    <title>Website Downtime Alert</title>
+    <style>
+        :root {
+            color-scheme: light dark;
+            supported-color-schemes: light dark;
+        }
+        /* Default Dark Mode Styles */
+        body {
+            font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
+            background-color: #0d1117; /* Dark GitHub background */
+            margin: 0;
+            padding: 0;
+            color: #c9d1d9; /* Light text */
+        }
+        .container {
+            max-width: 600px;
+            margin: 40px auto;
+            background-color: #161b22; /* Darker container */
+            border-radius: 8px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.5);
+            overflow: hidden;
+            border: 1px solid #30363d;
+        }
+        .header {
+            background-color: #cb2431; /* Slightly darker red */
+            color: #ffffff;
+            padding: 24px;
+            text-align: center;
+        }
+        .header h1 {
+            margin: 0;
+            font-size: 24px;
+            font-weight: 600;
+            letter-spacing: 0.5px;
+        }
+        .content {
+            padding: 32px;
+        }
+        .alert-icon {
+            text-align: center;
+            margin-bottom: 24px;
+        }
+        .alert-icon svg {
+            width: 48px;
+            height: 48px;
+            fill: #cb2431;
+        }
+        .message-title {
+            font-size: 20px;
+            font-weight: 600;
+            margin-bottom: 16px;
+            color: #f0f6fc; /* Very light text */
+            text-align: center;
+        }
+        .message-body {
+            font-size: 16px;
+            line-height: 1.6;
+            margin-bottom: 24px;
+            color: #8b949e; /* Muted text */
+            text-align: center;
+        }
+        .highlight {
+            font-weight: 600;
+            color: #f0f6fc;
+            background-color: rgba(187, 128, 9, 0.15); /* Dark highlight bg */
+            padding: 2px 6px;
+            border-radius: 4px;
+            border: 1px solid rgba(187, 128, 9, 0.4);
+        }
+        .details-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-bottom: 24px;
+            font-size: 14px;
+        }
+        .details-table th, .details-table td {
+            text-align: left;
+            padding: 12px;
+            border-bottom: 1px solid #30363d;
+        }
+        .details-table th {
+            color: #8b949e;
+            font-weight: 500;
+            width: 40%;
+        }
+        .details-table td {
+            color: #c9d1d9;
+            font-weight: 600;
+        }
+        .footer {
+            background-color: #0d1117;
+            padding: 24px;
+            text-align: center;
+            font-size: 12px;
+            color: #8b949e;
+            border-top: 1px solid #30363d;
+        }
+        .button-container {
+            text-align: center;
+            margin-bottom: 16px;
+        }
+        .cta-button {
+            display: inline-block;
+            background-color: #238636; /* GitHub Green */
+            color: #ffffff;
+            padding: 12px 24px;
+            border-radius: 6px;
+            text-decoration: none;
+            font-weight: 600;
+            font-size: 16px;
+            transition: background-color 0.2s;
+        }
+        .cta-button:hover {
+            background-color: #2ea043;
+        }
+
+        /* Light Mode Overrides */
+        @media (prefers-color-scheme: light) {
+            body {
+                background-color: #f4f6f8;
+                color: #333;
+            }
+            .container {
+                background-color: #ffffff;
+                border: 1px solid #e1e4e8;
+                box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+            }
+            .header {
+                background-color: #d73a49;
+            }
+            .alert-icon svg {
+                fill: #d73a49;
+            }
+            .message-title {
+                color: #24292e;
+            }
+            .message-body {
+                color: #586069;
+            }
+            .highlight {
+                color: #24292e;
+                background-color: #fffbdd;
+                border: 1px solid #fff5b1;
+            }
+            .details-table th, .details-table td {
+                border-bottom: 1px solid #e1e4e8;
+            }
+            .details-table th {
+                color: #586069;
+            }
+            .details-table td {
+                color: #24292e;
+            }
+            .footer {
+                background-color: #f6f8fa;
+                color: #6a737d;
+                border-top: 1px solid #e1e4e8;
+            }
+            .cta-button {
+                background-color: #0366d6;
+            }
+            .cta-button:hover {
+                background-color: #0255b3;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>Downtime Alert</h1>
+        </div>
+        <div class="content">
+            <div class="alert-icon">
+                <!-- Warning Icon -->
+                <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                    <path d="M12 2L1 21h22L12 2zm1 16h-2v-2h2v2zm0-4h-2V9h2v5z"/>
+                </svg>
+            </div>
+            <div class="message-title">Your Service is Unreachable</div>
+            <div class="message-body">
+                We detected that your website <span class="highlight">{{url}}</span> is currently down and not responding to our monitoring requests.
+            </div>
+
+            <table class="details-table">
+                <tr>
+                    <th>Monitored URL</th>
+                    <td>{{url}}</td>
+                </tr>
+                <tr>
+                    <th>Checked At</th>
+                    <td>{{time}}</td>
+                </tr>
+                <tr>
+                    <th>Status</th>
+                    <td style="color: #d73a49;">DOWN</td>
+                </tr>
+            </table>
+
+            <div class="button-container">
+                <a href="{{url}}" class="cta-button">Check Website</a>
+            </div>
+        </div>
+        <div class="footer">
+            <p>&copy; 2024 StackWatch Monitoring. All rights reserved.</p>
+            <p>You received this email because you have alerts enabled for this monitor.</p>
+        </div>
+    </div>
+</body>
+</html>
