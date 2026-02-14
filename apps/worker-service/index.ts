@@ -1,6 +1,6 @@
 // here I need to pick the websites from q and ping and put the status into the DB(bulk).
 import axios from "axios";
-import { ensureConsumerGroup, XAckBulk, XReadGroup } from "@repo/redis-queue/redis-client";
+import { ensureConsumerGroup, XAckBulk, XReadGroup } from "@repo/redis-queue";
 import { insertWebsiteTick } from "@repo/timeseries-database/timeseries";
 
 const REGION_ID = process.env.REGION_ID!;

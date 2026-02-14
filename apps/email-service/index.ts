@@ -2,7 +2,7 @@ import { Worker, Job } from "bullmq";
 import { redisOptions } from "@repo/redis-queue";
 import { sendEmail } from "@repo/common/email";
 
-const queueName = process.env.QUEUENAME || "stackwatch:email-queue";
+const queueName = process.env.QUEUENAME || "stackwatch-email-queue";
 
 interface EmailJobData {
   to: string;
