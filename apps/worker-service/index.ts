@@ -64,12 +64,12 @@ async function main() {
 async function fetchWebsite(url: string, website_id: string) {
     try {
         return new Promise<void>((resolve, reject) => {
-            const start_time = Date.now();
+            const start_time = performance.now();
 
             axios.get(url)
                 .then(async () => {
-                    const end_time = Date.now();
-                    const response_time_ms = end_time - start_time;
+                    const end_time = performance.now();
+                    const response_time_ms = Math.max(0, Math.floor(end_time - start_time));
                     await insertWebsiteTick({
                         websiteId: website_id,
                         regionId: REGION_ID,
@@ -79,8 +79,8 @@ async function fetchWebsite(url: string, website_id: string) {
                     resolve();
                 })
                 .catch(async () => {
-                    const end_time = Date.now();
-                    const response_time_ms = end_time - start_time;
+                    const end_time = performance.now();
+                    const response_time_ms = Math.max(0, Math.floor(end_time - start_time));
                     await insertWebsiteTick({
                         websiteId: website_id,
                         regionId: REGION_ID,

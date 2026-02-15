@@ -1,6 +1,31 @@
 {
   "$schema": "https://turborepo.dev/schema.json",
-  "globalEnv": ["BACKEND_URL"],
+  "globalEnv": [
+    "BACKEND_URL",
+    "MAINORIGINS",
+    "MAINORIGINS2",
+    "BACKEND_PORT",
+    "DATABASE_URL",
+    "BETTER_AUTH_SECRET",
+    "BETTER_AUTH_URL",
+    "REDIS_URL",
+    "STREAM_NAME",
+    "COUNT",
+    "HOST",
+    "PORT",
+    "TS_PORT",
+    "DATABASE_NAME",
+    "USERNAME_NAME",
+    "PASSWORD_NAME",
+    "MAX",
+    "TIME_INTERVAL",
+    "REGION_ID",
+    "WORKER_ID",
+    "EMAIL_SERVICE",
+    "EMAIL_SERVICE_USER",
+    "EMAIL_SERVICE_PASS",
+    "EMAILINTERVALTIME"
+  ],
   "tasks": {
     "build": {
       "dependsOn": ["^build"],
