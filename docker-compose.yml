@@ -1,19 +1,132 @@
-version: "3"
-
-volumes:
-  database:
-    driver: local
+version: "3.9"
 
 services:
-  db:
-    platform: linux/amd64
-    image: postgres:15 # Use a specific version of Postgres
+  stackwatch-redis:
+    image: redis:latest
+    ports:
+      - "6379:6379"
+
+  stackwatch-db:
+    image: postgres:15
     restart: always
     environment:
-      - POSTGRES_USER=sebi
-      - POSTGRES_PASSWORD=sebi_test_4444
-      - POSTGRES_DB=turborepo
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: stackwatch
+      POSTGRES_DB: stackwatch
     ports:
-      - '5432:5432' # Expose the Postgres port to your local machine
+      - "5434:5432"
     volumes:
-      - postgres_data:/var/lib/postgresql/data
+      - stackwatch_pgdata:/var/lib/postgresql/data
+
+  stackwatch-timeseries:
+    image: timescale/timescaledb:latest-pg16
+    restart: always
+    environment:
+      POSTGRES_USER: tsdb
+      POSTGRES_PASSWORD: tsdb
+      POSTGRES_DB: metrics
+    ports:
+      - "5435:5432"
+    volumes:
+      - stackwatch_tsdata:/var/lib/postgresql/data
+
+  stackwatch-init-migrations:
+    image: stackwatch-api:local
+    command: bun run --cwd packages/database db:migrate:deploy
+    env_file:
+      - .env.docker
+    depends_on:
+      - stackwatch-db
+
+  stackwatch-api:
+    build:
+      context: .
+      dockerfile: apps/api/Dockerfile
+    image: stackwatch-api:local
+    ports:
+      - "3001:3001"
+    env_file:
+      - .env.docker
+    depends_on:
+      stackwatch-db:
+        condition: service_started
+      stackwatch-redis:
+        condition: service_started
+      stackwatch-timeseries:
+        condition: service_started
+      stackwatch-init-migrations:
+        condition: service_completed_successfully
+
+  stackwatch-email-service:
+    build:
+      context: .
+      dockerfile: apps/email-service/Dockerfile
+    image: stackwatch-email-service:local
+    env_file:
+      - .env.docker
+    depends_on:
+      stackwatch-db:
+        condition: service_started
+      stackwatch-redis:
+        condition: service_started
+      stackwatch-timeseries:
+        condition: service_started
+      stackwatch-init-migrations:
+        condition: service_completed_successfully
+
+  stackwatch-pusher-service:
+    build:
+      context: .
+      dockerfile: apps/pusher-service/Dockerfile
+    image: stackwatch-pusher-service:local
+    env_file:
+      - .env.docker
+    depends_on:
+      stackwatch-db:
+        condition: service_started
+      stackwatch-redis:
+        condition: service_started
+      stackwatch-timeseries:
+        condition: service_started
+      stackwatch-init-migrations:
+        condition: service_completed_successfully
+
+  stackwatch-web:
+    build:
+      context: .
+      dockerfile: apps/web/Dockerfile
+    image: stackwatch-web:local
+    env_file:
+      - .env.docker
+    ports:
+      - "3000:3000"
+    depends_on:
+      stackwatch-db:
+        condition: service_started
+      stackwatch-redis:
+        condition: service_started
+      stackwatch-timeseries:
+        condition: service_started
+      stackwatch-init-migrations:
+        condition: service_completed_successfully
+
+  stackwatch-worker-service:
+    build:
+      context: .
+      dockerfile: apps/worker-service/Dockerfile
+    image: stackwatch-worker-service:local
+    env_file:
+      - .env.docker
+    depends_on:
+      stackwatch-db:
+        condition: service_started
+      stackwatch-redis:
+        condition: service_started
+      stackwatch-timeseries:
+        condition: service_started
+      stackwatch-init-migrations:
+        condition: service_completed_successfully
+
+volumes:
+  stackwatch_pgdata:
+  stackwatch_tsdata:

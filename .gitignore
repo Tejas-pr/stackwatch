@@ -37,3 +37,4 @@ apps/web/.env
 dist
 *dist
 packages/database/dist
+.env.docker

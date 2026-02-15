@@ -12,7 +12,6 @@ import { Button } from "@repo/ui/components/button";
 import { Input } from "@repo/ui/components/input";
 import { Label } from "@repo/ui/components/label";
 import { AlertCircle, Globe } from "lucide-react";
-import { Website } from "../../app/dashboard/page";
 import { addNewWebsite } from "../../lib/server";
 
 interface AddWebsiteModalProps {

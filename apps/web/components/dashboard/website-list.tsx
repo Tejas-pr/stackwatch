@@ -15,10 +15,10 @@ import { Badge } from "@repo/ui/components/badge";
 import { Trash2, ChevronRight, Circle, Activity, Clock } from "lucide-react";
 import { Website } from "../../app/dashboard/page";
 
-interface WebsiteListProps {
-  websites: Website[];
-  onDelete: (id: string) => void;
-}
+// interface WebsiteListProps {
+//   websites: Website[];
+//   onDelete: (id: string) => void;
+// }
 
 export default function x({ websites, onDelete }: any) {
   const formatTime = (date: Date) => {

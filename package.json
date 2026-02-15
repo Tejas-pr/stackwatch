@@ -14,7 +14,8 @@
     "format": "prettier --write \"**/*.{ts,tsx,md}\"",
     "generate": "turbo run generate",
     "lint": "turbo run lint",
-    "start:web": "bun --filter web start"
+    "start:web": "bun --filter web start",
+    "start:bootstrap": "turbo run start:bootstrap"
   },
   "devDependencies": {
     "prettier": "^3.2.5",

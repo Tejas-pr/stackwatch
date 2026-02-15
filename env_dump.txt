@@ -1,0 +1,27 @@
+REGION_ID=region_usa
+BETTER_AUTH_URL=http://stackwatch-web:3000
+MAINORIGINS2=
+REDIS_URL=redis://stackwatch-redis:6379
+USERNAME_NAME=tsdb
+PASSWORD_NAME=tsdb
+EMAIL_SERVICE_PASS=lwmg phpn xurv sidv
+BACKEND_URL=http://stackwatch-api:3001/api
+COUNT=5
+DATABASE_NAME=metrics
+BETTER_AUTH_SECRET=H1Tu2QUjxpt94vRIkxEz5kHUFOVGXGGP
+EMAIL_SERVICE=gmail
+DATABASE_URL=postgresql://postgres:stackwatch@stackwatch-db:5432/stackwatch
+TS_PORT=5435
+STREAM_NAME=stackwatch:websites
+EMAIL_SERVICE_USER=tejas.teju02@gmail.com
+MAINORIGINS=
+MAX=10
+TIME_INTERVAL=3
+WORKER_ID=usa:worker:01
+EMAILINTERVALTIME=900
+BACKEND_PORT=3001
+HOST=stackwatch-timeseries
+PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/usr/local/bun-node-fallback-bin
+BUN_RUNTIME_TRANSPILER_CACHE_PATH=0
+BUN_INSTALL_BIN=/usr/local/bin
+

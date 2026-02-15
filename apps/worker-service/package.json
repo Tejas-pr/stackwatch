@@ -4,9 +4,9 @@
   "type": "module",
   "private": true,
   "scripts": {
+    "start:bootstrap": "bun run bootstrap-timescale.ts",
     "dev": "bun --watch index.ts",
-    "start": "bun run index.ts",
-    "start:bootstrap": "bun run bootstrap-timescale.ts"
+    "start": "bun run start:bootstrap && bun run index.ts"
   },
   "dependencies": {
     "@repo/database": "*",

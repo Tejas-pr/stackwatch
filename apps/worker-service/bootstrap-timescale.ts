@@ -2,7 +2,7 @@ import postgres from "postgres";
 
 const sql = postgres({
   host: process.env.HOST || "localhost",
-  port: Number(process.env.PORT) || 5435,
+  port: Number(process.env.TS_PORT) || 5435,
   database: process.env.DATABASE_NAME || "metrics",
   username: process.env.USERNAME_NAME || "tsdb",
   password: process.env.PASSWORD_NAME || "tsdb",

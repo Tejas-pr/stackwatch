@@ -23,4 +23,4 @@ COPY --from=build /app/node_modules ./node_modules
 COPY --from=build /app/packages ./packages
 COPY --from=build /app/apps/worker-service ./apps/worker-service
 
-CMD ["bun", "run", "apps/worker-service/index.ts"]
+CMD ["sh", "-c", "bun run apps/worker-service/bootstrap-timescale.ts && bun run apps/worker-service/index.ts"]

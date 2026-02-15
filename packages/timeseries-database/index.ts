@@ -1,7 +1,7 @@
 import postgres from "postgres";
 
 const HOST = process.env.HOST || "localhost";
-const PORT = Number(process.env.PORT) || 5435;
+const PORT = Number(process.env.TS_PORT) || 5435;
 const DATABASE_NAME = process.env.DATABASE_NAME || "metrics";
 const USERNAME_NAME = process.env.USERNAME_NAME || "tsdb";
 const PASSWORD_NAME = process.env.PASSWORD_NAME || "tsdb";

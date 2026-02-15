@@ -159,8 +159,5 @@ The following items are currently under active development:
 Inspired by [Better Stack](https://betterstack.com/)
 
 ### TODO:
-1. Refresh token and access token.
-2. Docker and docker compose files.
-3. Email trigger service.
 4. Write tests.
 5. Notification service.

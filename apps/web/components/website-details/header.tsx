@@ -22,7 +22,6 @@ interface WebsiteDetailHeaderProps {
 
 export default function WebsiteDetailHeader({
   data,
-  stats,
 }: WebsiteDetailHeaderProps) {
   const formatTime = (date: Date) => {
     return new Date(date).toLocaleString('en-US', {
